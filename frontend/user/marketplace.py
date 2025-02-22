@@ -6,9 +6,6 @@ import json
 import random
 from decimal import Decimal
 
-# Must be the first Streamlit command
-st.set_page_config(page_title="NFT Marketplace", layout="wide")
-
 class NFTMarketplace:
     def __init__(self):
         # Initialize session state if not exists
@@ -60,7 +57,7 @@ class NFTMarketplace:
             return True
         return False
 
-def main():
+def main(wallet_address):
     marketplace = NFTMarketplace()
     
     # Sidebar
@@ -127,6 +124,3 @@ def main():
             st.dataframe(df)
         else:
             st.info("No rewards earned yet")
-
-if __name__ == "__main__":
-    main()

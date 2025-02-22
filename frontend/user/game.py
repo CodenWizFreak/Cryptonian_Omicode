@@ -75,10 +75,9 @@ def local_css():
     </style>
     """, unsafe_allow_html=True)
 
-def app():
+def app(wallet_address):
     """Main game selection and display"""
     # Display stats in sidebar
-    wallet_address = 'Ani'
     display_stats(wallet_address)
     
     local_css()

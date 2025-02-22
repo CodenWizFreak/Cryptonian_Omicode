@@ -155,17 +155,11 @@ def display_stats(wallet_address):
     if stats['achievements']:
         st.sidebar.markdown("### 🌟 Achievements")
         for achievement in stats['achievements']:
-            # Determine the correct category for each achievement
-            if achievement in ACHIEVEMENTS['puzzle']:
-                category = 'puzzle'
-            elif achievement in ACHIEVEMENTS['minesweeper']:
-                category = 'minesweeper'
-            else:
-                continue
             st.sidebar.markdown(create_achievement_badge(
-                ACHIEVEMENTS[category][achievement]['name'],
-                ACHIEVEMENTS[category][achievement]['desc']
+                ACHIEVEMENTS['puzzle' if 'puzzle' in achievement else 'minesweeper'][achievement]['name'],
+                ACHIEVEMENTS['puzzle' if 'puzzle' in achievement else 'minesweeper'][achievement]['desc']
             ), unsafe_allow_html=True)
+
 
 def update_achievement(wallet_address, achievement_type):
     """Update player achievements and display badge"""

@@ -1,7 +1,7 @@
 import streamlit as st
 import time
 
-def set_page_style():
+def set_style():
     st.markdown("""
         <style>
         .stApp {
@@ -84,8 +84,7 @@ def set_page_style():
         </style>
     """, unsafe_allow_html=True)
 
-def render_dashboard():
-    st.title("Neo Dashboard")
+def render_dashboard(wallet_address):
     col1, col2 = st.columns([2, 1])
     
     with col1:
@@ -138,6 +137,6 @@ def render_dashboard():
             ''', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-def app():
-    set_page_style()
-    render_dashboard()
+def app(wallet_address):
+    set_style()
+    render_dashboard(wallet_address)

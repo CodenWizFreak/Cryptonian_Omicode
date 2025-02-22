@@ -1,4 +1,6 @@
 import streamlit as st
+from datetime import datetime
+from database.db import * # Import the MongoDB connection function
 from frontend import home, about
 from frontend.user import dashboard, lesson, game, marketplace, leaderboard
 from frontend.user.chatbot import chatbot_ui
@@ -9,6 +11,18 @@ st.set_page_config(
     page_icon="🎮",
     layout="wide"
 )
+
+# Connect to MongoDB
+db = connect_db()
+
+def save_wallet_connection(wallet_address):
+    existing_user = db.users.find_one({"wallet_address": wallet_address})
+    status = "Login" if existing_user else "Sign Up"
+    db.users.insert_one({
+        "wallet_address": wallet_address,
+        "status": status,
+        "timestamp": datetime.now()
+    })
 
 # Sidebar navigation
 st.sidebar.title("Navigation")
@@ -21,7 +35,10 @@ if "wallet_address" not in st.session_state:
 
 # Navigation options based on wallet connection status
 if st.session_state["wallet_connected"]:
-    st.sidebar.success(f"Connected: {st.session_state['wallet_address'][:3]}...{st.session_state['wallet_address'][-3:]}")
+    wallet_address = st.session_state["wallet_address"]
+    save_wallet_connection(wallet_address)
+    
+    st.sidebar.success(f"Connected: {wallet_address[:3]}...{wallet_address[-3:]}")
     if st.sidebar.button("Logout", key="logout", help="Disconnect your wallet and return to basic features."):
         st.session_state["wallet_connected"] = False
         st.session_state["wallet_address"] = ""
@@ -44,12 +61,12 @@ if page == "Home":
 elif page == "About Us":
     about.app()
 elif page == "Dashboard":
-    dashboard.app()
+    dashboard.app(wallet_address=wallet_address)
 elif page == "Lessons":
-    lesson.app()
+    lesson.app(wallet_address=wallet_address)
 elif page == "Games":
-    game.app()
+    game.app(wallet_address=wallet_address)
 elif page == "Marketplace":
-    marketplace.main()
+    marketplace.main(wallet_address=wallet_address)
 elif page == "Leaderboard":
-    leaderboard.app()
+    leaderboard.app(wallet_address=wallet_address)
