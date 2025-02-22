@@ -15,19 +15,20 @@ st.sidebar.title("Navigation")
 # Check session state for wallet connection
 if "wallet_connected" not in st.session_state:
     st.session_state["wallet_connected"] = False
+if "wallet_address" not in st.session_state:
+    st.session_state["wallet_address"] = ""
 
+# Navigation options based on wallet connection status
 if st.session_state["wallet_connected"]:
+    st.sidebar.success(f"Connected: {st.session_state['wallet_address'][:3]}...{st.session_state['wallet_address'][-3:]}")
     if st.sidebar.button("Logout", key="logout", help="Disconnect your wallet and return to basic features."):
         st.session_state["wallet_connected"] = False
+        st.session_state["wallet_address"] = ""
         st.rerun()
     
     options = ["Dashboard", "Lessons", "Games", "Marketplace", "Leaderboard"]
     default_page = "Dashboard"
 else:
-    if st.sidebar.button("Connect Wallet", key="connect_wallet", help="Connect your wallet to access all features."):
-        st.session_state["wallet_connected"] = True
-        st.rerun()
-    
     options = ["Home", "About Us"]
     default_page = "Home"
 
