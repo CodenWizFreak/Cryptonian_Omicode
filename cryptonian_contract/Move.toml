@@ -1,0 +1,13 @@
+[package]
+name = "cryptonian_games"
+version = "1.0.0"
+
+[addresses]
+std = "0x49f44cfa4465b9a5f55927ec565b0560dacebf7ca2e2ae9c1f2d4ae153889bc4"
+aptos_framework = "0x1"
+cryptonian_games = "0x9c206f7c7f9e3e345695e3f32bef3d27a7667080d6e8efaa2a056d003b150684"
+
+
+[dependencies]
+AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", subdir = "aptos-move/framework/aptos-framework/", rev = "main" }
+MoveStdlib = { git = "https://github.com/aptos-labs/aptos-core.git", subdir = "aptos-move/framework/move-stdlib/", rev = "main" }
