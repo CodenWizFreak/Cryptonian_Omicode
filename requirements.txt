@@ -3,7 +3,12 @@ aptos_sdk
 pymongo
 python-dotenv
 pygame
-time
+datetime
 pandas
 web3
 streamlit_javascript
+transformers
+google-generativeai
+geopandas
+folium
+streamlit_folium
