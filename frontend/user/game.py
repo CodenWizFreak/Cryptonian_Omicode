@@ -2,7 +2,7 @@ import streamlit as st
 import random 
 from datetime import datetime
 import time
-from backend.games import minesweeper, nft
+from backend.games import minesweeper, nft, timeline_tactician
 from backend.games.console import *
 
 # SVG Assets
@@ -141,7 +141,7 @@ def app():
         # Game selection dropdown
     game_choice = st.selectbox(
         "Select your game",
-        ["Select your game", "Monument Scanner", "NFT Puzzle", "Map Quiz Challenge", "Minesweeper: Indian Edition"],
+        ["Select your game", "Monument Scanner", "NFT Puzzle", "Map Quiz Challenge", "Minesweeper: Indian Edition", "Timeline Tactician"],
         index=0
     )
     
@@ -153,4 +153,6 @@ def app():
     elif game_choice == "Monument Scanner":
         st.info("Monument Scanner coming soon!")
     elif game_choice == "Map Quiz Challenge":
-        map_quiz.app(wallet_address)
+        st.info("Map Quiz Challenge coming soon!")
+    elif game_choice == "Timeline Tactician":
+        timeline_tactician.app(wallet_address)
