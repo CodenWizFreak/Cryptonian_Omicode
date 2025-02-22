@@ -151,7 +151,7 @@ def app():
     elif game_choice == "Minesweeper: Indian Edition":
         minesweeper.app(wallet_address)
     elif game_choice == "Monument Scanner":
-        st.info("Monument Scanner coming soon!")
+        monument_scanner.app(wallet_address)
     elif game_choice == "Map Quiz Challenge":
         st.info("Map Quiz Challenge coming soon!")
     elif game_choice == "Timeline Tactician":
