@@ -2,6 +2,7 @@ import streamlit as st
 import random
 import os
 from PIL import Image
+from datetime import datetime
 
 # Custom CSS with Streamlit
 st.markdown("""
@@ -162,14 +163,39 @@ def random_state(state_list, used_states):
         return None, None
     return random.choice(available_states)
 
-def app():
+def update_activity_progress(wallet_address, activity_name, activity_type, progress, total, additional_data=None):
+    # Placeholder function to simulate updating activity progress
+    st.success(f"Activity progress updated for {wallet_address}: {activity_name}")
+
+def resize_image(image, width):
+    # Resize the image while maintaining aspect ratio
+    aspect_ratio = image.height / image.width
+    new_height = int(width * aspect_ratio)
+    return image.resize((width, new_height))
+
+def app(wallet_address):
     st.title("🎯 Guess the Indian State!")
     
     # Initialize session state
     if "used_states" not in st.session_state:
         st.session_state.used_states = set()
         st.session_state.score = 0
-    
+        st.session_state.difficulty = "Easy"
+        st.session_state.game_started = False
+        st.session_state.piece_collection = []
+
+    # Difficulty level slider
+    difficulty_level = st.select_slider("Select Difficulty Level", options=["Easy", "Medium", "Hard"], value=st.session_state.difficulty)
+    st.session_state.difficulty = difficulty_level
+
+    # Determine the number of states to guess based on difficulty
+    if difficulty_level == "Easy":
+        num_states = 5
+    elif difficulty_level == "Medium":
+        num_states = 10
+    else:
+        num_states = 15
+
     states = get_states()
     selected_image, selected_name = random_state(states, st.session_state.used_states)
     
@@ -180,34 +206,38 @@ def app():
         if st.button("🎲 New Game", use_container_width=True):
             st.session_state.used_states.clear()
             st.session_state.score = 0
+            st.session_state.game_started = True
+            st.session_state.piece_collection = []
             st.rerun()
     
     with col2:
         if st.button("🔄 Reset Game", use_container_width=True):
             st.session_state.used_states.clear()
+            st.session_state.score = 0
+            st.session_state.game_started = False
+            st.session_state.piece_collection = []
             st.rerun()
 
     with col3:
         if st.button("💾 Save Game", use_container_width=True):
             if st.session_state.game_started and len(st.session_state.piece_collection) > 0:
                 saved_game = {
-                    'board': st.session_state.puzzle_board.copy(),
+                    'board': st.session_state.used_states.copy(),
                     'collection': st.session_state.piece_collection.copy(),
-                    'theme': theme,
+                    'theme': difficulty_level,
                     'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 }
                 update_activity_progress(
                     wallet_address, 
-                    'Puzzle NFT Game', 
-                    2,  # Save game activity type
+                    'map quiz',  
+                    3, 
                     len(st.session_state.piece_collection), 
-                    9,
+                    num_states,
                     additional_data=saved_game
                 )
                 st.success("Game saved successfully!")
             else:
                 st.warning("No active game to save!")
-
 
     if selected_image is None:
         st.session_state.used_states.clear()
@@ -219,7 +249,8 @@ def app():
     
     with col1:
         image = Image.open(f"assets/state/{selected_image}")
-        st.image(image, caption="Can you identify this state?", use_container_width=True)
+        resized_image = resize_image(image, 4375)  # Resize image to 4375 width
+        st.image(resized_image, caption="Can you identify this state?", use_container_width=True)
     
     with col2:
         st.markdown("### Choose your answer:")
@@ -233,7 +264,13 @@ def app():
             if choice == selected_name:
                 st.success(f"🎉 Correct! It's {selected_name}!")
                 st.session_state.score += 10
+                st.session_state.piece_collection.append(selected_name)
             else:
                 st.error(f"❌ Incorrect! The correct answer was {selected_name}.")
     
     st.markdown(f"### 🏆 Score: {st.session_state.score}")
+
+    # Check if the game is over
+    if len(st.session_state.used_states) >= num_states:
+        st.success(f"🎉 Congratulations! You've completed the {difficulty_level} level with a score of {st.session_state.score}!")
+        st.session_state.game_started = False

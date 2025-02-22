@@ -2,7 +2,7 @@ import streamlit as st
 import random 
 from datetime import datetime
 import time
-from backend.games import minesweeper, monument_scanner, nft, map_quiz
+from backend.games import minesweeper, monument_scanner, nft, map_quiz, artifact_assembler, timeline_tactician
 from backend.games.console import *
 
 # SVG Assets
@@ -113,6 +113,17 @@ def app(wallet_address):
             <div class="game-description">Test your knowledge of Indian geography</div>
         </div>
         """, unsafe_allow_html=True)
+
+        # Artifact Assembler
+        st.markdown("""
+        <div class="game-card">
+            <div class="icon-wrapper">
+                <i class="fas fa-landmark"></i>
+            </div>
+            <div class="game-title">Artifact Assembler</div>
+            <div class="game-description">Reassemble the artifact correctly!</div>
+        </div>
+        """, unsafe_allow_html=True)
     
     with col2:
         # NFT Puzzle
@@ -136,11 +147,22 @@ def app(wallet_address):
             <div class="game-description">Clear the board and answer geography questions</div>
         </div>
         """, unsafe_allow_html=True)
+
+        # Timeline Tactician
+        st.markdown("""
+        <div class="game-card">
+            <div class="icon-wrapper">
+                <i class="fas fa-timeline"></i>
+            </div>
+            <div class="game-title">Timeline Tactician</div>
+            <div class="game-description">Arrange the historical events in the correct chronological order!</div>
+        </div>
+        """, unsafe_allow_html=True)
     
         # Game selection dropdown
     game_choice = st.selectbox(
         "Select your game",
-        ["Select your game", "Monument Scanner", "NFT Puzzle", "Map Quiz Challenge", "Minesweeper: Indian Edition"],
+        ["Select your game", "Monument Scanner", "NFT Puzzle", "Map Quiz Challenge", "Minesweeper: Indian Edition", "Artifact Assembler", "Timeline Tactician"],
         index=0
     )
     
@@ -152,4 +174,8 @@ def app(wallet_address):
     elif game_choice == "Monument Scanner":
         monument_scanner.app(wallet_address)
     elif game_choice == "Map Quiz Challenge":
-        map_quiz.app()
+        map_quiz.app(wallet_address)
+    elif game_choice == "Timeline Tactician":
+        timeline_tactician.app(wallet_address)
+    elif game_choice == "Artifact Assembler":
+        artifact_assembler.app(wallet_address)
