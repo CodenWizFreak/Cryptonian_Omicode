@@ -106,7 +106,7 @@ def app():
         if wallet_address:
             st.session_state["wallet_connected"] = True
             st.session_state["wallet_address"] = wallet_address
-            st.experimental_rerun()
+            st.rerun()
         else:
             st.error("Please enter a wallet address.")
 

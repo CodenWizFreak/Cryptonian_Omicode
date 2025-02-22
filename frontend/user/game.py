@@ -153,4 +153,4 @@ def app():
     elif game_choice == "Monument Scanner":
         st.info("Monument Scanner coming soon!")
     elif game_choice == "Map Quiz Challenge":
-        st.info("Map Quiz Challenge coming soon!")
+        map_quiz.app(wallet_address)
