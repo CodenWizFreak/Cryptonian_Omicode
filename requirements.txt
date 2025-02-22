@@ -1,0 +1,9 @@
+streamlit
+aptos_sdk
+pymongo
+python-dotenv
+pygame
+time
+pandas
+web3
+streamlit_javascript
