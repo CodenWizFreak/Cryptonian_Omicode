@@ -7,13 +7,6 @@ from datetime import datetime
 import time
 from backend.games.console import *
 
-# Theme colors
-THEME_COLORS = {
-    "Classic": {"primary": "#4ECDC4", "secondary": "#FF6B6B", "accent": "#FFD93D"},
-    "Space": {"primary": "#2C3E50", "secondary": "#8E44AD", "accent": "#F1C40F"},
-    "Fantasy": {"primary": "#2ECC71", "secondary": "#E74C3C", "accent": "#F39C12"},
-    "Cyberpunk": {"primary": "#FF006E", "secondary": "#3A86FF", "accent": "#FFBE0B"}
-}
 
 # Achievements
 ACHIEVEMENTS = {
@@ -46,7 +39,6 @@ def app(wallet_address):
     
     with col1:
         if st.button("🎲 New Game", use_container_width=True):
-            # Save current game if it exists
             if st.session_state.game_started and len(st.session_state.piece_collection) > 0:
                 saved_game = {
                     'board': st.session_state.puzzle_board.copy(),
@@ -57,13 +49,13 @@ def app(wallet_address):
                 update_activity_progress(
                     wallet_address, 
                     'Puzzle NFT Game', 
-                    2,  # Save game activity type
+                    2,
                     len(st.session_state.piece_collection), 
-                    9
+                    9,
+                    additional_data=saved_game
                 )
                 st.success("Current game saved! Starting new game...")
             
-            # Reset game state
             st.session_state.puzzle_board = [0] * 9
             st.session_state.piece_collection = []
             st.session_state.game_started = False
@@ -87,7 +79,7 @@ def app(wallet_address):
                 update_activity_progress(
                     wallet_address, 
                     'Puzzle NFT Game', 
-                    2,  # Save game activity type
+                    2,
                     len(st.session_state.piece_collection), 
                     9,
                     additional_data=saved_game
@@ -127,8 +119,8 @@ def app(wallet_address):
                 st.balloons()
                 st.markdown(f"""
                 <div class='legendary-piece' style='text-align: center; animation: pulse 2s infinite;'>
-                    🌟 LEGENDARY {theme.upper()} PIECE MINTED! 🌟<br>
-                    Special Effect: {special_effect}
+                    🌟 LEGENDARY {theme.upper()} PIECE MINTED! 🌟
+                    <br>Special Effect: {special_effect}
                 </div>
                 """, unsafe_allow_html=True)
             elif rarity > 70:
@@ -137,8 +129,13 @@ def app(wallet_address):
             else:
                 st.success(f"New {theme} piece minted! Effect: {special_effect}")
             
-            update_activity_progress(wallet_address, 'Puzzle NFT Game', 1, 
-                                  len(st.session_state.piece_collection), 9)
+            update_activity_progress(
+                wallet_address, 
+                'Puzzle NFT Game', 
+                1, 
+                len(st.session_state.piece_collection), 
+                9
+            )
         else:
             st.warning("Maximum pieces collected! Place them to complete the puzzle.")
     

@@ -6,7 +6,24 @@
 import streamlit as st
 import random 
 from datetime import datetime
-import time
+import logging
+from pymongo import MongoClient
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Setup logging
+logger = logging.getLogger(__name__)
+
+# Theme colors
+THEME_COLORS = {
+    "Classic": {"primary": "#4ECDC4", "secondary": "#FF6B6B", "accent": "#FFD93D"},
+    "Space": {"primary": "#2C3E50", "secondary": "#8E44AD", "accent": "#F1C40F"},
+    "Fantasy": {"primary": "#2ECC71", "secondary": "#E74C3C", "accent": "#F39C12"},
+    "Cyberpunk": {"primary": "#FF006E", "secondary": "#3A86FF", "accent": "#FFBE0B"}
+}
 
 # Achievements
 ACHIEVEMENTS = {
@@ -21,20 +38,156 @@ ACHIEVEMENTS = {
         'survivor': {'name': '🛡️ Survivor', 'desc': 'Win 5 games', 'threshold': 5}
     }
 }
-def update_activity_progress(wallet_address, game, activity_type, current, total, additional_data=None):
-    # Placeholder for updating activity progress.
-    # For debugging, you might print or log the progress here.
-    # print(f"Updating progress for {wallet_address}: {game} - {activity_type} ({current}/{total})")
-    pass
 
-def get_user_progress(wallet_address, game):
-    # Placeholder for getting user progress.
-    # In production, fetch the actual progress from your database.
-    return {
-        'completed': 0,
-        'current_progress': 0,
-        'achievements': []
+# SVG Assets
+MINE_SVG = """<svg viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="40" fill="#FF4444"/>
+    <path d="M30,50 L70,50 M50,30 L50,70" stroke="white" stroke-width="8"/>
+</svg>"""
+
+MINE_SVG = """<svg viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="40" fill="#FF4444"/>
+    <path d="M30,50 L70,50 M50,30 L50,70" stroke="white" stroke-width="8"/>
+</svg>"""
+
+FLAG_SVG = """<svg viewBox="0 0 100 100">
+    <rect x="45" y="20" width="5" height="60" fill="#333"/>
+    <path d="M50,20 L80,35 L50,50" fill="#FF4444"/>
+</svg>"""
+
+
+#MongoDB
+def connect_db():
+    client = MongoClient(os.getenv("MONGO_URI"))
+    return client["mydatabase"]
+
+def update_activity_progress(wallet_address, activity_type, sl_no, completion, points, additional_data=None):
+    activity_mapping = {
+        'Puzzle NFT Game': 'game',
+        'Minesweeper': 'game'
     }
+    
+    db_activity_type = activity_mapping.get(activity_type, activity_type)
+    
+    try:
+        db = connect_db()
+        activities = db.activity
+        
+        update_data = {
+            'completion': completion,
+            'points': points,
+            'updated_at': datetime.now()
+        }
+        
+        if additional_data:
+            update_data['additional_data'] = additional_data
+            
+        activities.update_one(
+            {
+                'wallet_address': wallet_address,
+                'activity_type': db_activity_type,
+                'sl_no': sl_no
+            },
+            {
+                '$set': update_data
+            },
+            upsert=True
+        )
+        
+        logger.info(f"Activity progress updated: {wallet_address} - {activity_type} - {sl_no}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Error updating activity progress: {e}")
+        raise Exception(f"Failed to update activity progress: {e}")
+
+def get_user_progress(wallet_address, activity_type):
+    activity_mapping = {
+        'Puzzle NFT Game': 'game',
+        'Minesweeper': 'game'
+    }
+    
+    db_activity_type = activity_mapping.get(activity_type, activity_type)
+    
+    try:
+        db = connect_db()
+        activities = db.activity
+        
+        pipeline = [
+            {
+                '$match': {
+                    'wallet_address': wallet_address,
+                    'activity_type': db_activity_type
+                }
+            },
+            {
+                '$group': {
+                    '_id': None,
+                    'completed': {
+                        '$sum': {
+                            '$cond': [{'$eq': ['$completion', 100]}, 1, 0]
+                        }
+                    },
+                    'total_points': {'$sum': '$points'},
+                    'current_progress': {'$avg': '$completion'}
+                }
+            }
+        ]
+        
+        stats = list(activities.aggregate(pipeline))
+        achievements = list(db.achievements.find(
+            {'wallet_address': wallet_address, 'activity_type': db_activity_type},
+            {'_id': 0, 'achievement_type': 1}
+        ))
+        
+        result = {
+            'completed': 0,
+            'total_points': 0,
+            'current_progress': 0,
+            'achievements': [ach['achievement_type'] for ach in achievements]
+        }
+        
+        if stats:
+            result.update({
+                'completed': stats[0]['completed'],
+                'total_points': stats[0]['total_points'] or 0,
+                'current_progress': round(stats[0]['current_progress'] or 0, 2)
+            })
+            
+        return result
+        
+    except Exception as e:
+        logger.error(f"Error fetching user progress: {e}")
+        raise Exception(f"Failed to fetch user progress: {e}")
+
+def update_achievement(wallet_address, achievement_type):
+    try:
+        db = connect_db()
+        achievements = db.achievements
+        
+        activity_type = 'puzzle' if 'puzzle' in achievement_type else 'minesweeper'
+        
+        existing = achievements.find_one({
+            'wallet_address': wallet_address,
+            'achievement_type': achievement_type
+        })
+        
+        if not existing:
+            achievements.insert_one({
+                'wallet_address': wallet_address,
+                'achievement_type': achievement_type,
+                'activity_type': activity_type,
+                'earned_at': datetime.now()
+            })
+            
+            achievement = ACHIEVEMENTS[activity_type][achievement_type]
+            st.markdown(create_achievement_badge(
+                achievement['name'], 
+                achievement['desc']
+            ), unsafe_allow_html=True)
+            
+    except Exception as e:
+        raise Exception(f"Failed to update achievement: {e}")
 
 # -----------------------------------------------------------------------------
 # Utility Functions
@@ -160,18 +313,3 @@ def display_stats(wallet_address):
                 ACHIEVEMENTS['puzzle' if 'puzzle' in achievement else 'minesweeper'][achievement]['desc']
             ), unsafe_allow_html=True)
 
-
-def update_achievement(wallet_address, achievement_type):
-    """Update player achievements and display badge"""
-    # Determine the category of the achievement
-    if achievement_type in ACHIEVEMENTS['puzzle']:
-        category = 'puzzle'
-    elif achievement_type in ACHIEVEMENTS['minesweeper']:
-        category = 'minesweeper'
-    else:
-        st.error("Invalid achievement type")
-        return
-
-    achievement = ACHIEVEMENTS[category][achievement_type]
-    st.markdown(create_achievement_badge(achievement['name'], achievement['desc']), unsafe_allow_html=True)
-    update_activity_progress(wallet_address, 'achievements', achievement_type, 1, 1)
