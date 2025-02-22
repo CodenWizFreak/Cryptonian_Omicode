@@ -7,3 +7,5 @@ datetime
 pandas
 web3
 streamlit_javascript
+transformers
+google-generativeai
