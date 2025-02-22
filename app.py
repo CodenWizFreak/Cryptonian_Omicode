@@ -1,8 +1,9 @@
 import streamlit as st
 from frontend import home, about
 from frontend.user import dashboard, lesson, game, marketplace, leaderboard
+from frontend.user.chatbot import chatbot_ui
 
-# Configure page settings
+# ✅ Move this to the top before any other Streamlit functions
 st.set_page_config(
     page_title="Cryptonian - Learn, Play, Earn",
     page_icon="🎮",
@@ -34,6 +35,8 @@ else:
 
 # Selectbox for navigation
 page = st.sidebar.selectbox("Go to", options, index=options.index(default_page))
+
+chatbot_ui()
 
 # Render the selected page
 if page == "Home":

@@ -153,4 +153,3 @@ def app():
     elif game_choice == "Monument Scanner":
         monument_scanner.app(wallet_address)
     elif game_choice == "Map Quiz Challenge":
-        map_quiz.app()
