@@ -41,12 +41,12 @@ if page == "Home":
 elif page == "About Us":
     about.app()
 elif page == "Dashboard":
-    dashboard.app()
+    dashboard.app(wallet_address=wallet_address)
 elif page == "Lessons":
-    lesson.app()
+    lesson.app(wallet_address=wallet_address)
 elif page == "Games":
     game.app()
 elif page == "Marketplace":
-    marketplace.main()
+    marketplace.main(wallet_address=wallet_address)
 elif page == "Leaderboard":
-    leaderboard.app()
+    leaderboard.app(wallet_address=wallet_address)
