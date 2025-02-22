@@ -47,6 +47,6 @@ elif page == "Lessons":
 elif page == "Games":
     game.app()
 elif page == "Marketplace":
-    marketplace.app()
+    marketplace.main()
 elif page == "Leaderboard":
     leaderboard.app()
