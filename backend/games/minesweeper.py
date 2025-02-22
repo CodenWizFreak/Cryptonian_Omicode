@@ -8,20 +8,6 @@ from datetime import datetime
 import time
 from backend.games.console import *
 
-# Achievements
-ACHIEVEMENTS = {
-    'minesweeper': {
-        'expert': {'name': '💫 Mine Expert', 'desc': 'Win without any flags', 'threshold': 1},
-        'speed_demon': {'name': '🏃 Speed Demon', 'desc': 'Win under 1 minute', 'threshold': 60},
-        'survivor': {'name': '🛡️ Survivor', 'desc': 'Win 5 games', 'threshold': 5}
-    }
-}
-
-# SVG Assets
-MINE_SVG = """<svg viewBox="0 0 100 100">
-    <circle cx="50" cy="50" r="40" fill="#FF4444"/>
-    <path d="M30,50 L70,50 M50,30 L50,70" stroke="white" stroke-width="8"/>
-</svg>"""
 
 def app(wallet_address):
     """Minesweeper Game Implementation"""
