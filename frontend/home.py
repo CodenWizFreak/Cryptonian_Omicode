@@ -2,6 +2,8 @@ import streamlit as st
 import streamlit.components.v1 as components
 from PIL import Image
 import base64
+import json
+from pathlib import Path
 
 def load_css():
         return """
@@ -153,9 +155,22 @@ def app():
         </div>
     """, unsafe_allow_html=True)
 
+    def check_wallet_connection():
+        """Check if wallet is connected by reading from the file"""
+        wallet_file = Path("back_api/wallet_address.json")
+        if wallet_file.exists():
+            with open(wallet_file) as f:
+                data = json.load(f)
+                st.session_state["wallet_connected"] = data["connected"]
+                st.session_state["wallet_address"] = data["wallet_address"]
+        else:
+            st.session_state["wallet_connected"] = False
+            st.session_state["wallet_address"] = ""
+
     # Wallet connection logic
     if "wallet_connected" not in st.session_state:
         st.session_state["wallet_connected"] = False
+    check_wallet_connection()
 
     wallet_address = st.text_input("Enter Wallet Address", value="", key="wallet_address_input")
     
