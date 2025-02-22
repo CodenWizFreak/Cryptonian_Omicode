@@ -1,7 +1,8 @@
-# main.py
 import streamlit as st
+from backend.lessons.web3 import web3_lesson
+from backend.lessons.history import history_lesson
+from backend.lessons.geography import geography_lesson
 from frontend.user.lesson_styles import local_css
-import streamlit.components.v1 as components
 
 def app():
     local_css()
@@ -34,102 +35,16 @@ def app():
                 <h3>{course["title"]}</h3>
             </div>
             """, unsafe_allow_html=True)
-    
-    # Add dropdown for course selection
-    st.markdown("<br>", unsafe_allow_html=True)
-    course_options = {
-        "Select a course": None,
-        "Web3 Basics": "web3",
-        "Indian Geography": "geography",
-        "Indian History": "history"
+    st.title("Lessons")
+
+    lesson_options = {
+        "Web3": web3_lesson,
+        "History": history_lesson,
+        "Geography": geography_lesson
     }
-    
-    selected_course = st.selectbox(
-        "Choose your course",
-        options=list(course_options.keys()),
-        format_func=lambda x: x
-    )
-    
-    # Display selected course content
-    if selected_course != "Select a course":
-        course_key = course_options[selected_course]
-        
-        # Navigation tabs for course phases
-        if course_key == "web3":
-            phases = ["Introduction", "Smart Contracts", "DeFi & NFTs"]
-            current_phase = st.tabs(phases)
-            
-            # Phase 1
-            with current_phase[0]:
-                st.markdown("### Introduction to Blockchain")
-                st.write("""
-                Blockchain is a distributed ledger technology that enables secure, transparent, 
-                and immutable record-keeping. Let's explore the key concepts.
-                """)
-                with st.expander("Key Concepts"):
-                    st.write("""
-                    1. Decentralization
-                    2. Consensus Mechanisms
-                    3. Cryptography
-                    4. Smart Contracts
-                    """)
-                if st.button("Take Quiz - Phase 1"):
-                    st.info("Quiz functionality to be implemented")
-            
-            # Phase 2
-            with current_phase[1]:
-                st.markdown("### Smart Contracts & DApps")
-                st.write("""
-                Learn about self-executing contracts and decentralized applications.
-                """)
-                with st.expander("Topics Covered"):
-                    st.write("""
-                    - Solidity Programming
-                    - Web3.js Integration
-                    - DApp Architecture
-                    - Testing and Deployment
-                    """)
-                if st.button("Take Quiz - Phase 2"):
-                    st.info("Quiz functionality to be implemented")
-            
-            # Phase 3
-            with current_phase[2]:
-                st.markdown("### DeFi & NFTs")
-                st.write("""
-                Explore decentralized finance and non-fungible tokens.
-                """)
-                with st.expander("Key Topics"):
-                    st.write("""
-                    - Lending/Borrowing Protocols
-                    - Yield Farming
-                    - NFT Standards
-                    - Token Economics
-                    """)
-                if st.button("Take Quiz - Phase 3"):
-                    st.info("Quiz functionality to be implemented")
-        
-        elif course_key == "geography":
-            phases = ["Physical Geography", "Climate", "Resources"]
-            current_phase = st.tabs(phases)
-            
-            with current_phase[0]:
-                st.markdown("### Physical Geography of India")
-                st.write("""
-                Explore India's diverse landscape and physiographic divisions.
-                """)
-                # Add content similar to web3 structure
-            
-            # Add other phases similarly
-        
-        elif course_key == "history":
-            phases = ["Ancient India", "Medieval India", "Modern India"]
-            current_phase = st.tabs(phases)
-            
-            with current_phase[0]:
-                st.markdown("### Ancient Indian Civilization")
-                st.write("""
-                Journey through the rich history of ancient India.
-                """)
-                # Add content similar to web3 structure
-            
-            # Add other phases similarly
+
+    lesson_choice = st.selectbox("Select a Lesson", list(lesson_options.keys()))
+
+    if lesson_choice in lesson_options:
+        lesson_options[lesson_choice]()  # Call the appropriate lesson function
+
