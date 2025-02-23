@@ -62,16 +62,6 @@ def connect_db():
     return client["mydatabase"]
 
 def update_activity_progress(wallet_address, activity_type, sl_no, completion, points, additional_data=None):
-    activity_mapping = {
-        'Puzzle NFT Game': 'game',
-        'Minesweeper': 'game',
-        'Timeline Tactician': 'game',
-        'Monument Scanner': 'game',
-        'map quiz': 'game',
-        'Artifact Assembler': 'game'
-    }
-    
-    db_activity_type = activity_mapping.get(activity_type, activity_type)
     
     try:
         db = connect_db()
@@ -89,7 +79,7 @@ def update_activity_progress(wallet_address, activity_type, sl_no, completion, p
         activities.update_one(
             {
                 'wallet_address': wallet_address,
-                'activity_type': db_activity_type,
+                'activity_type': activity_type,
                 'sl_no': sl_no
             },
             {
@@ -106,12 +96,6 @@ def update_activity_progress(wallet_address, activity_type, sl_no, completion, p
         raise Exception(f"Failed to update activity progress: {e}")
 
 def get_user_progress(wallet_address, activity_type):
-    activity_mapping = {
-        'Puzzle NFT Game': 'game',
-        'Minesweeper': 'game'
-    }
-    
-    db_activity_type = activity_mapping.get(activity_type, activity_type)
     
     try:
         db = connect_db()
@@ -121,7 +105,7 @@ def get_user_progress(wallet_address, activity_type):
             {
                 '$match': {
                     'wallet_address': wallet_address,
-                    'activity_type': db_activity_type
+                    'activity_type': activity_type
                 }
             },
             {
@@ -140,7 +124,7 @@ def get_user_progress(wallet_address, activity_type):
         
         stats = list(activities.aggregate(pipeline))
         achievements = list(db.achievements.find(
-            {'wallet_address': wallet_address, 'activity_type': db_activity_type},
+            {'wallet_address': wallet_address, 'activity_type': activity_type},
             {'_id': 0, 'achievement_type': 1}
         ))
         
